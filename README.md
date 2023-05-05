@@ -43,7 +43,6 @@ begin
         end if
         swapCurrentPlayer
     end while
-end
 
 
 
