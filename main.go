@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"math/rand"
+	"example/pairProgramming/gui"
 )
 
 type Player struct {
@@ -39,6 +40,7 @@ var Board []Point //= createBoard()
 var currentPlayer *Player = &white
 
 func main() {
+	gui.GuiRun()
 	for {
 		p := randPickPiece(currentPlayer)
 		point := randMove(legalMoves(p))
