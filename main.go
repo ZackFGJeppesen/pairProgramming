@@ -1,209 +1,350 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	_ "image/png"
 	"log"
-	"math/rand"
+	"time"
+
+	d "golang.org/x/image/draw"
+
+	"github.com/hajimehoshi/ebiten"
+	//"github.com/hajimehoshi/ebiten/v2"
 	"example/pairProgramming/gui"
+	"example/pairProgramming/pieces"
 )
 
-type Player struct {
-	name   string
-	pieces []Piece
+const (
+	size = 640
+	squareSize = size/8
+)
+
+var (
+	WhitePawn *ebiten.Image
+	WhiteRook *ebiten.Image
+	WhiteKnight *ebiten.Image
+	WhiteBishop *ebiten.Image
+	WhiteKing *ebiten.Image
+	WhiteQueen *ebiten.Image
+	BlackPawn *ebiten.Image
+	BlackRook *ebiten.Image
+	BlackKnight *ebiten.Image
+	BlackBishop *ebiten.Image
+	BlackKing *ebiten.Image
+	BlackQueen *ebiten.Image
+	PSlice []piece
+	moves map[string][]string
+)
+
+func init() {
+	scaler := d.NearestNeighbor
+	img, _ , err := image.Decode(bytes.NewReader(pieces.Whitepawn_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhitePawn, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Whiterook_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhiteRook, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Whitebishop_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhiteBishop, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Whiteknight_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhiteKnight, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Whiteking_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhiteKing, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Whitequeen_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	WhiteQueen, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackpawn_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackPawn, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackrook_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackRook, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackbishop_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackBishop, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackknight_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackKnight, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackking_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackKing, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	img, _ , err = image.Decode(bytes.NewReader(pieces.Blackqueen_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	img = scaleTo(img, image.Rect(0,0,squareSize,squareSize), scaler)
+	BlackQueen, err = ebiten.NewImageFromImage(img, ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	PSlice = []piece{
+		{img: WhitePawn, kind: "whitePawn", x: 0, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 1, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 2, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 3, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 4, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 5, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 6, y: 6},
+		{img: WhitePawn, kind: "whitePawn", x: 7, y: 6},
+		{img: WhiteRook, kind: "rook", x: 0, y: 7},
+		{img: WhiteRook, kind: "rook", x: 7, y: 7},
+		{img: WhiteKnight, kind: "knight", x: 1, y: 7},
+		{img: WhiteKnight, kind: "knight", x: 6, y: 7},
+		{img: WhiteBishop, kind: "bishop", x: 2, y: 7},
+		{img: WhiteBishop, kind: "bishop", x: 5, y: 7},
+		{img: WhiteKing, kind: "king", x: 4, y: 7},
+		{img: WhiteQueen, kind: "queen", x: 3, y: 7},
+		{img: BlackPawn, kind: "blackPawn", x: 0, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 1, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 2, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 3, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 4, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 5, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 6, y: 1},
+		{img: BlackPawn, kind: "blackPawn", x: 7, y: 1},
+		{img: BlackRook, kind: "rook", x: 0, y: 0},
+		{img: BlackRook, kind: "rook", x: 7, y: 0},
+		{img: BlackKnight, kind: "knight", x: 1, y: 0},
+		{img: BlackKnight, kind: "knight", x: 6, y: 0},
+		{img: BlackBishop, kind: "bishop", x: 2, y: 0},
+		{img: BlackBishop, kind: "bishop", x: 5, y: 0},
+		{img: BlackKing, kind: "king", x: 4, y: 0},
+		{img: BlackQueen, kind: "queen", x: 3, y: 0},
+	}	
+
+	moves = make(map[string][]string)
+	moves["whitePawn"] = []string{"n"}
+	moves["blackPawn"] = []string{"s"}
+	moves["rook"] = []string{"s", "n", "w", "e"}
+	moves["bishop"] = []string{"sw", "nw", "nw", "se"}
+	moves["king"] = []string{"n","ne","e","se","s","sw","w","nw"}
+	moves["queen"] = []string{"n","ne","e","se","s","sw","w","nw"}
+
+
 }
 
-type Piece struct {
-	colour  string
-	name    string
-	kind    string
-	postion *Point
-	moves   []Point
+func (g *Game) updateGroundImage(ground *ebiten.Image) {
+//	op := &ebiten.DrawImageOptions{}
+//	ground.DrawImage(whitePawn, op)
+//	op.GeoM.Translate(float64(0), float64(size-squareSize))
+//	ground.DrawImage(whitePawn, op)
+//	op.GeoM.Reset()
 }
 
-type Point struct {
-	letter   int
-	number   int
-	occupied *Piece
+func drawSquare(xStart, yStart int, img *ebiten.Image, color color.Color) {
+	for y := yStart; y < yStart+squareSize; y++ {
+		for x := xStart; x < xStart+squareSize; x++ {
+			img.Set(x, y, color)
+		}
+	}
 }
 
-var whitePawnDir = []string{"n"}
-var blackPawnDir = []string{"s"}
-var kingDir = []string{"nw", "n", "ne", "w", "e", "sw", "s", "se"}
-var queenDir = []string{"nw", "n", "ne", "w", "e", "sw", "s", "se"}
-var rookDir = []string{"n", "w", "e", "s"}
-var bishopDir = []string{"nw", "ne", "sw", "se"}
-var knightDir = []string{}
+func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
+	col := color.White
+	var op ebiten.DrawImageOptions
+	for _, point := range gui.Board {
+		if point.Occupied == nil {
+			if (point.Letter + point.Number) % 2 == 0 {
+				col = color.Black
+			} else {
+				col = color.White
+			}
+			drawSquare(point.Letter*squareSize,point.Number*squareSize,ground, col)	
+		} else {
+			op := &ebiten.DrawImageOptions{}
+			for _, piece := range PSlice {
+				op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
+				ground.DrawImage(piece.img, op)
+				op.GeoM.Reset()
+			}
+			ground.DrawImage(point.Occupied.Img.(*ebiten.Image), op)
+		}
+	}
+	op.GeoM.Reset()
+	screen.DrawImage(ground, &ebiten.DrawImageOptions{})
+}
 
-var white Player
-var black Player
+func NewGame() *Game {
+	img, err := ebiten.NewImage(size,size,ebiten.FilterDefault)
+	if err != nil {
+		log.Fatal(err)
+	}
+	g := &Game{groundImage: img}
+	return g
+}
 
-var Board []Point //= createBoard()
-var currentPlayer *Player = &white
+func (g *Game) Draw(screen *ebiten.Image) {
+	g.updateGroundImage(g.groundImage)
+	g.drawGroundImage(screen, g.groundImage)
+}
 
-func main() {
-	gui.GuiRun()
+type piece struct {
+	img *ebiten.Image
+	kind string
+	x int
+	y int
+}
+
+type Game struct {
+	groundImage *ebiten.Image
+}
+
+func (g *Game) Update(img *ebiten.Image) error {
+	// Manipulate the player by the input.
+	var lm []gui.Point 
+	var p *gui.Point
 	for {
-		p := randPickPiece(currentPlayer)
-		point := randMove(legalMoves(p))
-		Board[p.postion.letter*8+p.postion.number].occupied = nil
-		Board[point.letter*8+point.number].occupied = &p
-		swap(currentPlayer)
+		p = gui.RandPickPiece()
+		lm = gui.LegalMoves(*p)
+		if len(lm) != 0 {
+			break
+		}
 	}
+	fmt.Println(lm)
+	point := gui.RandMove(lm)
+	gui.Board[p.Letter*8+p.Number].Occupied = nil
+	gui.Board[point.Letter*8+point.Number].Occupied = p.Occupied
+	gui.Swap()
+	//PSlice[piece].x = point.Letter
+	//PSlice[piece].y = point.Number
+	time.Sleep(time.Second*2)
+	return nil
 }
 
-func randPickPiece(currentPlayer *Player) Piece {
-	return currentPlayer.pieces[rand.Intn(len(currentPlayer.pieces))]
+func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+	return size, size
 }
 
-func randMove(returnMoves []Point) Point {
-	return returnMoves[rand.Intn(len(returnMoves))]
-}
-
-func swap(currentPlayer *Player) {
-	if currentPlayer.name == "white" {
-		currentPlayer = &black
-	} else {
-		currentPlayer = &white
-	}
-}
-
-func legalMoves(p Piece) []Point {
-	var returnMoves []Point
-	if p.kind != "knight" {
-		for dir, dist := range direction(p) {
-
-			var nextStep Point
-		loop:
-			for step := 1; step <= dist; step++ {
-				switch dir {
-				case "nw":
-					nextStep = Point{letter: p.postion.letter - step, number: p.postion.number + step}
-				case "n":
-					nextStep = Point{letter: p.postion.letter, number: p.postion.number + step}
-				case "ne":
-					nextStep = Point{letter: p.postion.letter + step, number: p.postion.number + step}
-				case "w":
-					nextStep = Point{letter: p.postion.letter - step, number: p.postion.number}
-				case "e":
-					nextStep = Point{letter: p.postion.letter + step, number: p.postion.number}
-				case "sw":
-					nextStep = Point{letter: p.postion.letter - step, number: p.postion.number - step}
-				case "s":
-					nextStep = Point{letter: p.postion.letter, number: p.postion.number - step}
-				case "se":
-					nextStep = Point{letter: p.postion.letter + step, number: p.postion.number - step}
-				default:
+func addImg() {
+	for i := range gui.Board {
+		if gui.Board[i].Occupied != nil {
+			switch gui.Board[i].Occupied.Kind {
+			case "whitePawn":
+				gui.Board[i].Occupied.Img = WhitePawn	
+			case "blackPawn":
+				gui.Board[i].Occupied.Img = BlackPawn	
+			case "rook":
+				if gui.Board[i].Occupied.Colour == "white" {
+					gui.Board[i].Occupied.Img = WhiteRook	
+				} else {
+					gui.Board[i].Occupied.Img = BlackRook	
 				}
-				switch check(nextStep) {
-				case "empty":
-					returnMoves = append(returnMoves, nextStep)
-				case "capture":
-					returnMoves = append(returnMoves, nextStep)
-					break loop
-				case "friend":
-					break loop
-				case "outOfBounds":
-					break loop
-				default:
-					break loop
+			case "bishop":
+				if gui.Board[i].Occupied.Colour == "white" {
+					gui.Board[i].Occupied.Img = WhiteBishop
+				} else {
+					gui.Board[i].Occupied.Img = BlackBishop	
+				}
+			case "knight":
+				if gui.Board[i].Occupied.Colour == "white" {
+					gui.Board[i].Occupied.Img = WhiteKnight
+				} else {
+					gui.Board[i].Occupied.Img = BlackKnight	
+				}
+			case "queen":
+				if gui.Board[i].Occupied.Colour == "white" {
+					gui.Board[i].Occupied.Img = WhiteQueen
+				} else {
+					gui.Board[i].Occupied.Img = BlackQueen	
+				}
+			case "king":
+				if gui.Board[i].Occupied.Colour == "white" {
+					gui.Board[i].Occupied.Img = WhiteKing
+				} else {
+					gui.Board[i].Occupied.Img = BlackKing	
 				}
 			}
 		}
-	} else {
-		tempP := Point{letter: p.postion.letter - 2, number: p.postion.number + 1}
-		s := check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter - 1, number: p.postion.number + 2}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter + 1, number: p.postion.number + 2}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter + 2, number: p.postion.number + 1}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter + 2, number: p.postion.number - 1}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter + 1, number: p.postion.number - 2}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter - 1, number: p.postion.number - 2}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
-
-		tempP = Point{letter: p.postion.letter - 2, number: p.postion.number - 1}
-		s = check(tempP)
-		if s == "empty" || s == "capture" {
-			returnMoves = append(returnMoves, tempP)
-		}
 	}
-	return returnMoves
 }
 
-func direction(p Piece) map[string]int {
-	moves := make(map[string]int)
-	switch p.kind {
-	case "whitePawn":
-		for _, dir := range whitePawnDir {
-			moves[dir] = 1
-		}
-
-	case "blackPawn":
-		for _, dir := range blackPawnDir {
-			moves[dir] = 1
-		}
-
-	case "king":
-		for _, dir := range kingDir {
-			moves[dir] = 1
-		}
-	case "queen":
-		for _, dir := range queenDir {
-			moves[dir] = 8
-		}
-	case "rook":
-		for _, dir := range rookDir {
-			moves[dir] = 8
-		}
-	case "bishop":
-		for _, dir := range bishopDir {
-			moves[dir] = 8
-		}
-	default:
-		log.Fatal("Error, no piece selected")
+func main() {
+	gui.SetUpBoard()
+	gui.SetUpPlayer()
+	ebiten.SetWindowSize(size,size)
+	ebiten.SetWindowTitle("Chess")
+	addImg()
+	if err := ebiten.RunGame(NewGame()); err != nil {
+		log.Fatal(err)
 	}
-	return moves
 }
 
-func check(nextStep Point) string {
-	if 0 <= nextStep.letter && nextStep.letter <= 8 && 0 <= nextStep.number && nextStep.number <= 8 {
-		if Board[nextStep.letter*8+nextStep.number].occupied == nil {
-			return "empty"
-		} else if Board[nextStep.letter*8+nextStep.number].occupied.colour == currentPlayer.name {
-			return "friend"
-		} else {
-			return "capture"
-		}
-	}
-	return "outOfBounds"
+func scaleTo(src image.Image, rect image.Rectangle, sc d.Scaler) image.Image {
+	dst := image.NewRGBA(rect)
+	sc.Scale(dst, rect, src, src.Bounds(), draw.Over, nil)
+	return dst
 }
+
