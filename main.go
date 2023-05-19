@@ -13,8 +13,7 @@ import (
 	d "golang.org/x/image/draw"
 
 	"github.com/hajimehoshi/ebiten"
-	//"github.com/hajimehoshi/ebiten/v2"
-	"example/pairProgramming/gui"
+	"example/pairProgramming/gamelogic"
 	"example/pairProgramming/pieces"
 )
 
@@ -215,7 +214,7 @@ func drawSquare(xStart, yStart int, img *ebiten.Image, color color.Color) {
 func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 	col := color.White
 	var op ebiten.DrawImageOptions
-	for _, point := range gui.Board {
+	for _, point := range gamelogic.Board {
 		if point.Occupied == nil {
 			if (point.Letter + point.Number) % 2 == 0 {
 				col = color.Black
@@ -264,20 +263,20 @@ type Game struct {
 
 func (g *Game) Update(img *ebiten.Image) error {
 	// Manipulate the player by the input.
-	var lm []gui.Point 
-	var p *gui.Point
+	var lm []gamelogic.Point 
+	var p *gamelogic.Point
 	for {
-		p = gui.RandPickPiece()
-		lm = gui.LegalMoves(*p)
+		p = gamelogic.RandPickPiece()
+		lm = gamelogic.LegalMoves(*p)
 		if len(lm) != 0 {
 			break
 		}
 	}
 	fmt.Println(lm)
-	point := gui.RandMove(lm)
-	gui.Board[p.Letter*8+p.Number].Occupied = nil
-	gui.Board[point.Letter*8+point.Number].Occupied = p.Occupied
-	gui.Swap()
+	point := gamelogic.RandMove(lm)
+	gamelogic.Board[p.Letter*8+p.Number].Occupied = nil
+	gamelogic.Board[point.Letter*8+point.Number].Occupied = p.Occupied
+	gamelogic.Swap()
 	//PSlice[piece].x = point.Letter
 	//PSlice[piece].y = point.Number
 	time.Sleep(time.Second*2)
@@ -289,42 +288,42 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 }
 
 func addImg() {
-	for i := range gui.Board {
-		if gui.Board[i].Occupied != nil {
-			switch gui.Board[i].Occupied.Kind {
+	for i := range gamelogic.Board {
+		if gamelogic.Board[i].Occupied != nil {
+			switch gamelogic.Board[i].Occupied.Kind {
 			case "whitePawn":
-				gui.Board[i].Occupied.Img = WhitePawn	
+				gamelogic.Board[i].Occupied.Img = WhitePawn	
 			case "blackPawn":
-				gui.Board[i].Occupied.Img = BlackPawn	
+				gamelogic.Board[i].Occupied.Img = BlackPawn	
 			case "rook":
-				if gui.Board[i].Occupied.Colour == "white" {
-					gui.Board[i].Occupied.Img = WhiteRook	
+				if gamelogic.Board[i].Occupied.Colour == "white" {
+					gamelogic.Board[i].Occupied.Img = WhiteRook	
 				} else {
-					gui.Board[i].Occupied.Img = BlackRook	
+					gamelogic.Board[i].Occupied.Img = BlackRook	
 				}
 			case "bishop":
-				if gui.Board[i].Occupied.Colour == "white" {
-					gui.Board[i].Occupied.Img = WhiteBishop
+				if gamelogic.Board[i].Occupied.Colour == "white" {
+					gamelogic.Board[i].Occupied.Img = WhiteBishop
 				} else {
-					gui.Board[i].Occupied.Img = BlackBishop	
+					gamelogic.Board[i].Occupied.Img = BlackBishop	
 				}
 			case "knight":
-				if gui.Board[i].Occupied.Colour == "white" {
-					gui.Board[i].Occupied.Img = WhiteKnight
+				if gamelogic.Board[i].Occupied.Colour == "white" {
+					gamelogic.Board[i].Occupied.Img = WhiteKnight
 				} else {
-					gui.Board[i].Occupied.Img = BlackKnight	
+					gamelogic.Board[i].Occupied.Img = BlackKnight	
 				}
 			case "queen":
-				if gui.Board[i].Occupied.Colour == "white" {
-					gui.Board[i].Occupied.Img = WhiteQueen
+				if gamelogic.Board[i].Occupied.Colour == "white" {
+					gamelogic.Board[i].Occupied.Img = WhiteQueen
 				} else {
-					gui.Board[i].Occupied.Img = BlackQueen	
+					gamelogic.Board[i].Occupied.Img = BlackQueen	
 				}
 			case "king":
-				if gui.Board[i].Occupied.Colour == "white" {
-					gui.Board[i].Occupied.Img = WhiteKing
+				if gamelogic.Board[i].Occupied.Colour == "white" {
+					gamelogic.Board[i].Occupied.Img = WhiteKing
 				} else {
-					gui.Board[i].Occupied.Img = BlackKing	
+					gamelogic.Board[i].Occupied.Img = BlackKing	
 				}
 			}
 		}
@@ -332,8 +331,8 @@ func addImg() {
 }
 
 func main() {
-	gui.SetUpBoard()
-	gui.SetUpPlayer()
+	gamelogic.SetUpBoard()
+	gamelogic.SetUpPlayer()
 	ebiten.SetWindowSize(size,size)
 	ebiten.SetWindowTitle("Chess")
 	addImg()
