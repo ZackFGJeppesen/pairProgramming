@@ -151,38 +151,38 @@ func init() {
 		log.Fatal(err)
 	}
 	PSlice = []piece{
-		{img: WhitePawn, kind: "whitePawn", x: 0, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 1, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 2, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 3, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 4, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 5, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 6, y: 6},
-		{img: WhitePawn, kind: "whitePawn", x: 7, y: 6},
-		{img: WhiteRook, kind: "rook", x: 0, y: 7},
-		{img: WhiteRook, kind: "rook", x: 7, y: 7},
-		{img: WhiteKnight, kind: "knight", x: 1, y: 7},
-		{img: WhiteKnight, kind: "knight", x: 6, y: 7},
-		{img: WhiteBishop, kind: "bishop", x: 2, y: 7},
-		{img: WhiteBishop, kind: "bishop", x: 5, y: 7},
-		{img: WhiteKing, kind: "king", x: 4, y: 7},
-		{img: WhiteQueen, kind: "queen", x: 3, y: 7},
-		{img: BlackPawn, kind: "blackPawn", x: 0, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 1, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 2, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 3, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 4, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 5, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 6, y: 1},
-		{img: BlackPawn, kind: "blackPawn", x: 7, y: 1},
-		{img: BlackRook, kind: "rook", x: 0, y: 0},
-		{img: BlackRook, kind: "rook", x: 7, y: 0},
-		{img: BlackKnight, kind: "knight", x: 1, y: 0},
-		{img: BlackKnight, kind: "knight", x: 6, y: 0},
-		{img: BlackBishop, kind: "bishop", x: 2, y: 0},
-		{img: BlackBishop, kind: "bishop", x: 5, y: 0},
-		{img: BlackKing, kind: "king", x: 4, y: 0},
-		{img: BlackQueen, kind: "queen", x: 3, y: 0},
+		{img: WhitePawn, kind: "whitePawn", x: 0, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 1, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 2, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 3, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 4, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 5, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 6, y: 1},
+		{img: WhitePawn, kind: "whitePawn", x: 7, y: 1},
+		{img: WhiteRook, kind: "rook", x: 0, y: 0},
+		{img: WhiteRook, kind: "rook", x: 7, y: 0},
+		{img: WhiteKnight, kind: "knight", x: 1, y: 0},
+		{img: WhiteKnight, kind: "knight", x: 6, y: 0},
+		{img: WhiteBishop, kind: "bishop", x: 2, y: 0},
+		{img: WhiteBishop, kind: "bishop", x: 5, y: 0},
+		{img: WhiteKing, kind: "king", x: 4, y: 0},
+		{img: WhiteQueen, kind: "queen", x: 3, y: 0},
+		{img: BlackPawn, kind: "blackPawn", x: 0, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 1, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 2, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 3, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 4, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 5, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 6, y: 6},
+		{img: BlackPawn, kind: "blackPawn", x: 7, y: 6},
+		{img: BlackRook, kind: "rook", x: 0, y: 7},
+		{img: BlackRook, kind: "rook", x: 7, y: 7},
+		{img: BlackKnight, kind: "knight", x: 1, y: 7},
+		{img: BlackKnight, kind: "knight", x: 6, y: 7},
+		{img: BlackBishop, kind: "bishop", x: 2, y: 7},
+		{img: BlackBishop, kind: "bishop", x: 5, y: 7},
+		{img: BlackKing, kind: "king", x: 4, y: 7},
+		{img: BlackQueen, kind: "queen", x: 3, y: 7},
 	}
 
 	moves = make(map[string][]string)
@@ -213,7 +213,7 @@ func drawSquare(xStart, yStart int, img *ebiten.Image, color color.Color) {
 
 func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 	col := color.White
-	var op ebiten.DrawImageOptions
+	op := &ebiten.DrawImageOptions{}
 	for _, point := range gamelogic.Board {
 		if point.Occupied == nil {
 			if (point.Letter+point.Number)%2 == 0 {
@@ -223,13 +223,9 @@ func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 			}
 			drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
 		} else {
-			op := &ebiten.DrawImageOptions{}
-			for _, piece := range PSlice {
-				op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
-				ground.DrawImage(piece.img, op)
-				op.GeoM.Reset()
-			}
+			op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
 			ground.DrawImage(point.Occupied.Img, op)
+			op.GeoM.Reset()
 		}
 	}
 	op.GeoM.Reset()
@@ -263,6 +259,9 @@ type Game struct {
 
 func (g *Game) Update(img *ebiten.Image) error {
 	// Manipulate the player by the input.
+	for i, piece := range gamelogic.Board {
+		fmt.Printf("Square %d is %v", i, piece.Occupied)
+	}
 	var lm []gamelogic.Point
 	var p *gamelogic.Point
 	for {
@@ -290,6 +289,7 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func addImg() {
 	for i := range gamelogic.Board {
 		if gamelogic.Board[i].Occupied != nil {
+			fmt.Printf("adding image of kind: %s\n", gamelogic.Board[i].Occupied.Kind)
 			switch gamelogic.Board[i].Occupied.Kind {
 			case "whitePawn":
 				gamelogic.Board[i].Occupied.Img = WhitePawn
