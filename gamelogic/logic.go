@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+
+	"github.com/hajimehoshi/ebiten"
 )
 
 type Player struct {
@@ -11,9 +13,9 @@ type Player struct {
 	Pieces []*Piece
 }
 type Piece struct {
-	Colour  string
-	Kind    string
-	Img interface{}
+	Colour string
+	Kind   string
+	Img    *ebiten.Image
 }
 
 type Point struct {
@@ -35,7 +37,6 @@ var black Player
 
 var Board []*Point //= createBoard()
 var CurrentPlayer *Player = &white
-
 
 func RandPickPiece() *Point {
 	for {
@@ -204,7 +205,7 @@ func check(nextStep Point) string {
 func SetUpBoard() {
 	Board = make([]*Point, 64)
 	for i := 0; i < 64; i++ {
-		temp := Point{Letter: i%8, Number: int(i/8), Occupied: nil}
+		temp := Point{Letter: i % 8, Number: int(i / 8), Occupied: nil}
 		Board[i] = &temp
 	}
 }
@@ -217,26 +218,26 @@ func createPiece(colour, kind string, point *Point, n int) {
 }
 
 func SetUpPlayer() {
-	white = Player{Name: "white", Pieces: make([]*Piece,16)}
-	black = Player{Name: "black", Pieces: make([]*Piece,16)}
+	white = Player{Name: "white", Pieces: make([]*Piece, 16)}
+	black = Player{Name: "black", Pieces: make([]*Piece, 16)}
 	for i := 0; i < 8; i++ {
 		createPiece("white", "whitePawn", Board[i+8], i)
 		createPiece("black", "blackPawn", Board[i+47], i)
 	}
-	createPiece("black", "rook", Board[56],8)
-	createPiece("black", "rook", Board[63],9)
-	createPiece("white", "rook", Board[7],8)
-	createPiece("white", "rook", Board[0],9)
-	createPiece("black", "knight", Board[57],10)
-	createPiece("black", "knight", Board[62],11)
-	createPiece("white", "knight", Board[1],10)
-	createPiece("white", "knight", Board[6],11)
-	createPiece("black", "bishop", Board[58],12)
-	createPiece("black", "bishop", Board[61],13)
-	createPiece("white", "bishop", Board[2],12)
-	createPiece("white", "bishop", Board[5],13)
-	createPiece("black", "queen", Board[59],14)
-	createPiece("black", "king", Board[60],15)
-	createPiece("white", "queen", Board[3],14)
-	createPiece("white", "king", Board[4],15)
+	createPiece("black", "rook", Board[56], 8)
+	createPiece("black", "rook", Board[63], 9)
+	createPiece("white", "rook", Board[7], 8)
+	createPiece("white", "rook", Board[0], 9)
+	createPiece("black", "knight", Board[57], 10)
+	createPiece("black", "knight", Board[62], 11)
+	createPiece("white", "knight", Board[1], 10)
+	createPiece("white", "knight", Board[6], 11)
+	createPiece("black", "bishop", Board[58], 12)
+	createPiece("black", "bishop", Board[61], 13)
+	createPiece("white", "bishop", Board[2], 12)
+	createPiece("white", "bishop", Board[5], 13)
+	createPiece("black", "queen", Board[59], 14)
+	createPiece("black", "king", Board[60], 15)
+	createPiece("white", "queen", Board[3], 14)
+	createPiece("white", "king", Board[4], 15)
 }
