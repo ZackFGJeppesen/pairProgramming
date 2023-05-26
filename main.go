@@ -215,24 +215,18 @@ func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 	var col color.RGBA
 	op := &ebiten.DrawImageOptions{}
 	for _, point := range gamelogic.Board {
-		if point.Occupied == nil {
-			if (point.Letter+point.Number)%2 == 0 {
-				col = color.RGBA{R: 103, G: 51, B: 20, A: 127}
-			} else {
-				col = color.RGBA{R: 249, G: 172, B: 113, A: 127}
-			}
-			drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
+		if (point.Letter+point.Number)%2 == 0 {
+			col = color.RGBA{R: 103, G: 51, B: 20, A: 127}
 		} else {
-			if (point.Letter+point.Number)%2 == 0 {
-				col = color.RGBA{R: 103, G: 51, B: 20, A: 127}
-			} else {
-				col = color.RGBA{R: 249, G: 172, B: 113, A: 127}
-			}
+			col = color.RGBA{R: 249, G: 172, B: 113, A: 127}
+		}
+		drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
+		if point.Occupied != nil {
 			drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
 			op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
 			ground.DrawImage(point.Occupied.Img, op)
 			op.GeoM.Reset()
-		}
+		} 	
 	}
 	op.GeoM.Reset()
 	screen.DrawImage(ground, &ebiten.DrawImageOptions{})
