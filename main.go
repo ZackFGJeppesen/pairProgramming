@@ -222,7 +222,6 @@ func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 		}
 		drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
 		if point.Occupied != nil {
-			drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
 			op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
 			ground.DrawImage(point.Occupied.Img, op)
 			op.GeoM.Reset()
