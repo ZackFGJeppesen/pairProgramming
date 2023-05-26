@@ -24,20 +24,20 @@ const (
 )
 
 var (
-	WhitePawn   *ebiten.Image
-	WhiteRook   *ebiten.Image
-	WhiteKnight *ebiten.Image
-	WhiteBishop *ebiten.Image
-	WhiteKing   *ebiten.Image
-	WhiteQueen  *ebiten.Image
-	BlackPawn   *ebiten.Image
-	BlackRook   *ebiten.Image
-	BlackKnight *ebiten.Image
-	BlackBishop *ebiten.Image
-	BlackKing   *ebiten.Image
-	BlackQueen  *ebiten.Image
-	PSlice      []piece
-	moves       map[string][]string
+	WhitePawn    *ebiten.Image
+	WhiteRook    *ebiten.Image
+	WhiteKnight  *ebiten.Image
+	WhiteBishop  *ebiten.Image
+	WhiteKing    *ebiten.Image
+	WhiteQueen   *ebiten.Image
+	BlackPawn    *ebiten.Image
+	BlackRook    *ebiten.Image
+	BlackKnight  *ebiten.Image
+	BlackBishop  *ebiten.Image
+	BlackKing    *ebiten.Image
+	BlackQueen   *ebiten.Image
+	moves        map[string][]string
+	notFirstMove bool
 )
 
 func init() {
@@ -150,40 +150,40 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	PSlice = []piece{
-		{img: WhitePawn, kind: "whitePawn", x: 0, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 1, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 2, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 3, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 4, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 5, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 6, y: 1},
-		{img: WhitePawn, kind: "whitePawn", x: 7, y: 1},
-		{img: WhiteRook, kind: "rook", x: 0, y: 0},
-		{img: WhiteRook, kind: "rook", x: 7, y: 0},
-		{img: WhiteKnight, kind: "knight", x: 1, y: 0},
-		{img: WhiteKnight, kind: "knight", x: 6, y: 0},
-		{img: WhiteBishop, kind: "bishop", x: 2, y: 0},
-		{img: WhiteBishop, kind: "bishop", x: 5, y: 0},
-		{img: WhiteKing, kind: "king", x: 4, y: 0},
-		{img: WhiteQueen, kind: "queen", x: 3, y: 0},
-		{img: BlackPawn, kind: "blackPawn", x: 0, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 1, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 2, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 3, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 4, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 5, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 6, y: 6},
-		{img: BlackPawn, kind: "blackPawn", x: 7, y: 6},
-		{img: BlackRook, kind: "rook", x: 0, y: 7},
-		{img: BlackRook, kind: "rook", x: 7, y: 7},
-		{img: BlackKnight, kind: "knight", x: 1, y: 7},
-		{img: BlackKnight, kind: "knight", x: 6, y: 7},
-		{img: BlackBishop, kind: "bishop", x: 2, y: 7},
-		{img: BlackBishop, kind: "bishop", x: 5, y: 7},
-		{img: BlackKing, kind: "king", x: 4, y: 7},
-		{img: BlackQueen, kind: "queen", x: 3, y: 7},
-	}
+	// PSlice = []piece{
+	// 	{img: WhitePawn, kind: "whitePawn", x: 0, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 1, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 2, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 3, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 4, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 5, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 6, y: 1},
+	// 	{img: WhitePawn, kind: "whitePawn", x: 7, y: 1},
+	// 	{img: WhiteRook, kind: "rook", x: 0, y: 0},
+	// 	{img: WhiteRook, kind: "rook", x: 7, y: 0},
+	// 	{img: WhiteKnight, kind: "knight", x: 1, y: 0},
+	// 	{img: WhiteKnight, kind: "knight", x: 6, y: 0},
+	// 	{img: WhiteBishop, kind: "bishop", x: 2, y: 0},
+	// 	{img: WhiteBishop, kind: "bishop", x: 5, y: 0},
+	// 	{img: WhiteKing, kind: "king", x: 4, y: 0},
+	// 	{img: WhiteQueen, kind: "queen", x: 3, y: 0},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 0, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 1, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 2, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 3, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 4, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 5, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 6, y: 6},
+	// 	{img: BlackPawn, kind: "blackPawn", x: 7, y: 6},
+	// 	{img: BlackRook, kind: "rook", x: 0, y: 7},
+	// 	{img: BlackRook, kind: "rook", x: 7, y: 7},
+	// 	{img: BlackKnight, kind: "knight", x: 1, y: 7},
+	// 	{img: BlackKnight, kind: "knight", x: 6, y: 7},
+	// 	{img: BlackBishop, kind: "bishop", x: 2, y: 7},
+	// 	{img: BlackBishop, kind: "bishop", x: 5, y: 7},
+	// 	{img: BlackKing, kind: "king", x: 4, y: 7},
+	// 	{img: BlackQueen, kind: "queen", x: 3, y: 7},
+	// }
 
 	moves = make(map[string][]string)
 	moves["whitePawn"] = []string{"n"}
@@ -193,14 +193,6 @@ func init() {
 	moves["king"] = []string{"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 	moves["queen"] = []string{"n", "ne", "e", "se", "s", "sw", "w", "nw"}
 
-}
-
-func (g *Game) updateGroundImage(ground *ebiten.Image) {
-	// op := &ebiten.DrawImageOptions{}
-	// ground.DrawImage(whitePawn, op)
-	// op.GeoM.Translate(float64(0), float64(size-squareSize))
-	// ground.DrawImage(whitePawn, op)
-	// op.GeoM.Reset()
 }
 
 func drawSquare(xStart, yStart int, img *ebiten.Image, color color.Color) {
@@ -225,7 +217,7 @@ func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 			op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
 			ground.DrawImage(point.Occupied.Img, op)
 			op.GeoM.Reset()
-		} 	
+		}
 	}
 	op.GeoM.Reset()
 	screen.DrawImage(ground, &ebiten.DrawImageOptions{})
@@ -241,7 +233,6 @@ func NewGame() *Game {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.updateGroundImage(g.groundImage)
 	g.drawGroundImage(screen, g.groundImage)
 }
 
@@ -258,25 +249,27 @@ type Game struct {
 
 func (g *Game) Update(img *ebiten.Image) error {
 	// Manipulate the player by the input.
-	for i, piece := range gamelogic.Board {
-		fmt.Printf("Square %d is %v", i, piece.Occupied)
-	}
-	var lm []gamelogic.Point
-	var p *gamelogic.Point
+	// for i, piece := range gamelogic.Board {
+	// 	fmt.Printf("Square %d is %v", i, piece.Occupied)
+	// }
+	var lm map[gamelogic.Square]gamelogic.Square
+	var squaresWithPieces []gamelogic.Square
 	for {
-		p = gamelogic.RandPickPiece()
-		lm = gamelogic.LegalMoves(*p)
+		squaresWithPieces = gamelogic.RandPickSquare()
+		lm = gamelogic.LegalMoves(squaresWithPieces)
 		if len(lm) != 0 {
 			break
 		}
 	}
+
+	s, point := gamelogic.RandMove(lm)
+	fmt.Printf("Piece %s is at Square (%d, %d) \n", s.Occupied.Kind, s.Letter, s.Number)
 	fmt.Println(lm)
-	point := gamelogic.RandMove(lm)
-	gamelogic.Board[p.Letter*8+p.Number].Occupied = nil
-	gamelogic.Board[point.Letter*8+point.Number].Occupied = p.Occupied
+	gamelogic.Board[s.Letter+s.Number*8].Occupied = nil
+	gamelogic.Board[point.Letter+point.Number*8].Occupied = s.Occupied
 	gamelogic.Swap()
-	//PSlice[piece].x = point.Letter
-	//PSlice[piece].y = point.Number
+	point = gamelogic.Board[point.Letter+point.Number*8]
+	fmt.Printf("Piece %s is now at Square (%d, %d) \n", point.Occupied.Kind, point.Letter, point.Number)
 	time.Sleep(time.Second * 2)
 	return nil
 }
