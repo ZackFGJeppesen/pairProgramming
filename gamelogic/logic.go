@@ -5,8 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-
-	"github.com/hajimehoshi/ebiten"
 )
 
 type Player string
@@ -14,7 +12,6 @@ type Player string
 type Piece struct {
 	Colour string
 	Kind   string
-	Img    *ebiten.Image
 }
 
 type Square struct {
@@ -36,6 +33,19 @@ var black Player
 
 var Board []Square //= createBoard()
 var CurrentPlayer *Player = &white
+
+func GetSquare(i int) (int, int, string, string) {
+	var kind string
+	var colour string
+	if Board[i].Occupied == nil {
+		kind = ""
+		colour = ""
+	} else {
+		kind = Board[i].Occupied.Kind
+		colour = Board[i].Occupied.Colour
+	}
+	return Board[i].Letter, Board[i].Number, kind, colour
+}
 
 func SetUpPlayer() {
 	white = Player("white")
@@ -62,6 +72,26 @@ func SetUpPlayer() {
 	createPiece("white", "king", &Board[60], 15)
 }
 
+func Move() {
+	var lm map[Square][]Square
+	var squaresWithPieces []Square
+	for {
+		squaresWithPieces = randPickSquare()
+		lm = legalMoves(squaresWithPieces)
+		if len(lm) != 0 {
+			break
+		}
+	}
+	s, point := randMove(lm)
+	fmt.Printf("Piece %s is at Square (%d, %d) \n", s.Occupied.Kind, s.Letter, s.Number)
+	fmt.Println(lm)
+	Board[s.Letter+s.Number*8].Occupied = nil
+	Board[point.Letter+point.Number*8].Occupied = s.Occupied
+	swap()
+	point = Board[point.Letter+point.Number*8]
+	fmt.Printf("Piece %s is now at Square (%d, %d) \n", point.Occupied.Kind, point.Letter, point.Number)
+}
+
 func SetUpBoard() {
 	Board = make([]Square, 64)
 	for i := 0; i < 64; i++ {
@@ -70,7 +100,7 @@ func SetUpBoard() {
 	}
 }
 
-func RandPickSquare() []Square {
+func randPickSquare() []Square {
 	var squares []Square = []Square{}
 	for n := range Board {
 		if Board[n].Occupied != nil && Board[n].Occupied.Colour == string(*CurrentPlayer) {
@@ -80,7 +110,11 @@ func RandPickSquare() []Square {
 	return squares
 }
 
-func RandMove(returnMoves map[Square][]Square) (Square, Square) {
+func randMove(returnMoves map[Square][]Square) (Square, Square) {
+	if len(returnMoves) == 0 {
+		fmt.Println("Draw")
+		os.Exit(0)
+	}
 	fmt.Println("--------------", len(returnMoves))
 	r := rand.Intn(len(returnMoves))
 	counter := 0
@@ -94,7 +128,7 @@ func RandMove(returnMoves map[Square][]Square) (Square, Square) {
 	return Square{}, Square{}
 }
 
-func LegalMoves(squares []Square) map[Square][]Square {
+func legalMoves(squares []Square) map[Square][]Square {
 	returnMoves := make(map[Square][]Square)
 	for _, s := range squares {
 		if s.Occupied.Kind != "knight" {
@@ -112,7 +146,7 @@ func LegalMoves(squares []Square) map[Square][]Square {
 	return returnMoves
 }
 
-func Swap() {
+func swap() {
 	if *CurrentPlayer == "white" {
 		CurrentPlayer = &black
 	} else {
@@ -218,7 +252,6 @@ func direction(p Square) map[string]int {
 		if Board[step(p,"ne")].Occupied != nil && Board[step(p,"ne")].Occupied.Colour != p.Occupied.Colour {
 			moves["ne"] = 1
 		}
-
 	case "blackPawn":
 		//s capture
 		if Board[step(p,"s")].Occupied == nil {
@@ -239,7 +272,6 @@ func direction(p Square) map[string]int {
 		if Board[step(p,"se")].Occupied != nil && Board[step(p,"se")].Occupied.Colour != p.Occupied.Colour {
 			moves["se"] = 1
 		}
-
 	case "king":
 		for _, dir := range kingDir {
 			moves[dir] = 1
@@ -281,7 +313,7 @@ func check(nextStep Square) string {
 
 
 func createPiece(colour, kind string, Square *Square, n int) {
-	temp := &Piece{Colour: colour, Kind: kind, Img: nil}
+	temp := &Piece{Colour: colour, Kind: kind}
 	Square.Occupied = temp
 }
 

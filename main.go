@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -206,16 +205,17 @@ func drawSquare(xStart, yStart int, img *ebiten.Image, color color.Color) {
 func (g *Game) drawGroundImage(screen, ground *ebiten.Image) {
 	var col color.RGBA
 	op := &ebiten.DrawImageOptions{}
-	for _, point := range gamelogic.Board {
-		if (point.Letter+point.Number)%2 == 0 {
+	for i := 0; i < 64; i++ {
+		letter, number, kind, colour := gamelogic.GetSquare(i)
+		if (letter+number)%2 == 0 {
 			col = color.RGBA{R: 103, G: 51, B: 20, A: 127}
 		} else {
 			col = color.RGBA{R: 249, G: 172, B: 113, A: 127}
 		}
-		drawSquare(point.Letter*squareSize, point.Number*squareSize, ground, col)
-		if point.Occupied != nil {
-			op.GeoM.Translate(float64(point.Letter*squareSize), float64(point.Number*squareSize))
-			ground.DrawImage(point.Occupied.Img, op)
+		drawSquare(letter*squareSize, number*squareSize, ground, col)
+		if kind != "" {
+			op.GeoM.Translate(float64(letter*squareSize), float64(number*squareSize))
+			ground.DrawImage(getImage(kind, colour), op)
 			op.GeoM.Reset()
 		}
 	}
@@ -252,24 +252,7 @@ func (g *Game) Update(img *ebiten.Image) error {
 	// for i, piece := range gamelogic.Board {
 	// 	fmt.Printf("Square %d is %v", i, piece.Occupied)
 	// }
-	var lm map[gamelogic.Square][]gamelogic.Square
-	var squaresWithPieces []gamelogic.Square
-	for {
-		squaresWithPieces = gamelogic.RandPickSquare()
-		lm = gamelogic.LegalMoves(squaresWithPieces)
-		if len(lm) != 0 {
-			break
-		}
-	}
-
-	s, point := gamelogic.RandMove(lm)
-	fmt.Printf("Piece %s is at Square (%d, %d) \n", s.Occupied.Kind, s.Letter, s.Number)
-	fmt.Println(lm)
-	gamelogic.Board[s.Letter+s.Number*8].Occupied = nil
-	gamelogic.Board[point.Letter+point.Number*8].Occupied = s.Occupied
-	gamelogic.Swap()
-	point = gamelogic.Board[point.Letter+point.Number*8]
-	fmt.Printf("Piece %s is now at Square (%d, %d) \n", point.Occupied.Kind, point.Letter, point.Number)
+	gamelogic.Move()
 	time.Sleep(time.Second * 2)
 	return nil
 }
@@ -278,55 +261,12 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return size, size
 }
 
-func addImg() {
-	for i := range gamelogic.Board {
-		if gamelogic.Board[i].Occupied != nil {
-			switch gamelogic.Board[i].Occupied.Kind {
-			case "whitePawn":
-				gamelogic.Board[i].Occupied.Img = WhitePawn
-			case "blackPawn":
-				gamelogic.Board[i].Occupied.Img = BlackPawn
-			case "rook":
-				if gamelogic.Board[i].Occupied.Colour == "white" {
-					gamelogic.Board[i].Occupied.Img = WhiteRook
-				} else {
-					gamelogic.Board[i].Occupied.Img = BlackRook
-				}
-			case "bishop":
-				if gamelogic.Board[i].Occupied.Colour == "white" {
-					gamelogic.Board[i].Occupied.Img = WhiteBishop
-				} else {
-					gamelogic.Board[i].Occupied.Img = BlackBishop
-				}
-			case "knight":
-				if gamelogic.Board[i].Occupied.Colour == "white" {
-					gamelogic.Board[i].Occupied.Img = WhiteKnight
-				} else {
-					gamelogic.Board[i].Occupied.Img = BlackKnight
-				}
-			case "queen":
-				if gamelogic.Board[i].Occupied.Colour == "white" {
-					gamelogic.Board[i].Occupied.Img = WhiteQueen
-				} else {
-					gamelogic.Board[i].Occupied.Img = BlackQueen
-				}
-			case "king":
-				if gamelogic.Board[i].Occupied.Colour == "white" {
-					gamelogic.Board[i].Occupied.Img = WhiteKing
-				} else {
-					gamelogic.Board[i].Occupied.Img = BlackKing
-				}
-			}
-		}
-	}
-}
 
 func main() {
 	gamelogic.SetUpBoard()
 	gamelogic.SetUpPlayer()
 	ebiten.SetWindowSize(size, size)
 	ebiten.SetWindowTitle("Chess")
-	addImg()
 	if err := ebiten.RunGame(NewGame()); err != nil {
 		log.Fatal(err)
 	}
@@ -336,4 +276,46 @@ func scaleTo(src image.Image, rect image.Rectangle, sc d.Scaler) image.Image {
 	dst := image.NewRGBA(rect)
 	sc.Scale(dst, rect, src, src.Bounds(), draw.Over, nil)
 	return dst
+}
+
+func getImage(kind, colour string) *ebiten.Image {
+	switch kind {
+	case "whitePawn":
+		return WhitePawn
+	case "blackPawn":
+		return BlackPawn
+	case "rook":
+		if colour == "white" {
+			return WhiteRook
+		} else {
+			return BlackRook
+		}
+	case "bishop":
+		if colour == "white" {
+			return WhiteBishop
+		} else {
+			return BlackBishop
+		}
+	case "knight":
+		if colour == "white" {
+			return WhiteKnight
+		} else {
+			return BlackKnight
+		}
+	case "queen":
+		if colour == "white" {
+			return WhiteQueen
+		} else {
+			return BlackQueen
+		}
+	case "king":
+		if colour == "white" {
+			return WhiteKing
+		} else {
+			return BlackKing
+		}
+	default:
+		log.Fatal("Error in getImage")
+		return nil
+	}
 }
