@@ -252,7 +252,7 @@ func (g *Game) Update(img *ebiten.Image) error {
 	// for i, piece := range gamelogic.Board {
 	// 	fmt.Printf("Square %d is %v", i, piece.Occupied)
 	// }
-	var lm map[gamelogic.Square]gamelogic.Square
+	var lm map[gamelogic.Square][]gamelogic.Square
 	var squaresWithPieces []gamelogic.Square
 	for {
 		squaresWithPieces = gamelogic.RandPickSquare()
