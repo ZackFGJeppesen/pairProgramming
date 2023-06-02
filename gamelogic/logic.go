@@ -85,10 +85,10 @@ func Move() {
 	s, point := randMove(lm)
 	fmt.Printf("Piece %s is at Square (%d, %d) \n", s.Occupied.Kind, s.Letter, s.Number)
 	fmt.Println(lm)
-	Board[s.Letter+s.Number*8].Occupied = nil
-	Board[point.Letter+point.Number*8].Occupied = s.Occupied
+	Board[step(s, "")].Occupied = nil
+	Board[step(point, "")].Occupied = s.Occupied
 	swap()
-	point = Board[point.Letter+point.Number*8]
+	point = Board[step(point, "")]
 	fmt.Printf("Piece %s is now at Square (%d, %d) \n", point.Occupied.Kind, point.Letter, point.Number)
 }
 
