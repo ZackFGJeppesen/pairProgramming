@@ -149,40 +149,6 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// PSlice = []piece{
-	// 	{img: WhitePawn, kind: "whitePawn", x: 0, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 1, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 2, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 3, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 4, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 5, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 6, y: 1},
-	// 	{img: WhitePawn, kind: "whitePawn", x: 7, y: 1},
-	// 	{img: WhiteRook, kind: "rook", x: 0, y: 0},
-	// 	{img: WhiteRook, kind: "rook", x: 7, y: 0},
-	// 	{img: WhiteKnight, kind: "knight", x: 1, y: 0},
-	// 	{img: WhiteKnight, kind: "knight", x: 6, y: 0},
-	// 	{img: WhiteBishop, kind: "bishop", x: 2, y: 0},
-	// 	{img: WhiteBishop, kind: "bishop", x: 5, y: 0},
-	// 	{img: WhiteKing, kind: "king", x: 4, y: 0},
-	// 	{img: WhiteQueen, kind: "queen", x: 3, y: 0},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 0, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 1, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 2, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 3, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 4, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 5, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 6, y: 6},
-	// 	{img: BlackPawn, kind: "blackPawn", x: 7, y: 6},
-	// 	{img: BlackRook, kind: "rook", x: 0, y: 7},
-	// 	{img: BlackRook, kind: "rook", x: 7, y: 7},
-	// 	{img: BlackKnight, kind: "knight", x: 1, y: 7},
-	// 	{img: BlackKnight, kind: "knight", x: 6, y: 7},
-	// 	{img: BlackBishop, kind: "bishop", x: 2, y: 7},
-	// 	{img: BlackBishop, kind: "bishop", x: 5, y: 7},
-	// 	{img: BlackKing, kind: "king", x: 4, y: 7},
-	// 	{img: BlackQueen, kind: "queen", x: 3, y: 7},
-	// }
 
 	moves = make(map[string][]string)
 	moves["whitePawn"] = []string{"n"}
@@ -260,7 +226,6 @@ func (g *Game) Update(img *ebiten.Image) error {
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return size, size
 }
-
 
 func main() {
 	gamelogic.SetUpBoard()
